@@ -205,3 +205,38 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+patients.db
+
+# ----------------------------
+# Python / venv
+# ----------------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.db
+*.log
+
+# Virtual environments
+.venv/
+venv/
+env/
+healthcare-env/
+
+# ----------------------------
+# Environment variables
+# ----------------------------
+.env         # actual secrets (NEVER commit)
+.env.*       # any other variants like .env.dev, .env.prod
+!.env.example   # keep the template in Git
+
+# ----------------------------
+# IDE / Editor
+# ----------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+
