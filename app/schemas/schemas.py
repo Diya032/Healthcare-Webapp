@@ -123,3 +123,36 @@ class MedicalHistoryOut(MedicalHistoryBase):
     model_config = ConfigDict(from_attributes= True)
 
 # -------------------------
+
+
+# -------------------------
+# SLOT SCHEMAS
+# -------------------------
+class SlotOut(BaseModel):
+    id: int
+    doctor_id: int
+    datetime: datetime
+    is_booked: bool   # cast Integer (0/1) -> bool in response
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+# -------------------------
+# APPOINTMENT SCHEMAS
+# -------------------------
+class AppointmentBase(BaseModel):
+    patient_name: str
+    patient_email: EmailStr
+
+
+class AppointmentCreate(AppointmentBase):
+    slot_id: int
+
+
+class AppointmentOut(AppointmentBase):
+    id: int
+    slot_id: int
+    slot: SlotOut
+    booked_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)

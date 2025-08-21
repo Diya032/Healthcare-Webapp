@@ -7,7 +7,7 @@ from .models import models
 from app.core.database import engine
 
 # Import routers (we’ll create patient routes later)
-from .routers import patients, auth, medicalhistory
+from .routers import patients, auth, medicalhistory, appointments
 
 # ----------------------------
 # Step 1a: Create Database Tables
@@ -48,6 +48,11 @@ app.include_router(
     tags=["Medical History"]
 )
 
+app.include_router(
+    appointments.router, 
+    tags=["Appointments"]
+)  # <- appointments added
+
 # ----------------------------
 # Step 1d: Root Endpoint
 # ----------------------------
@@ -56,3 +61,4 @@ app.include_router(
 @app.get("/")
 def root():
     return {"message": "Patient Service API is running"}
+
