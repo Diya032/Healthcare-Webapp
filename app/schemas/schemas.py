@@ -9,7 +9,7 @@
 
 from typing import Optional, Literal
 from pydantic import BaseModel, EmailStr, ConfigDict
-from datetime import date, datetime
+from datetime import date, datetime,time
 
 
 # -------------------------
@@ -125,34 +125,65 @@ class MedicalHistoryOut(MedicalHistoryBase):
 # -------------------------
 
 
+from datetime import datetime
+from pydantic import BaseModel, EmailStr
+from typing import Optional, List
+
 # -------------------------
-# SLOT SCHEMAS
+# Doctor Schemas
 # -------------------------
+class DoctorCreate(BaseModel):
+    name: str
+    specialty: str
+
+class DoctorOut(BaseModel):
+    id: int
+    name: str
+    specialty: str
+
+    class Config:
+        orm_mode = True
+
+# -------------------------
+# Slot Schemas
+# -------------------------
+class SlotCreate(BaseModel):
+    datetime: datetime
+
+class BulkSlotCreate(BaseModel):
+    doctor_id: int
+    date: date
+    start_time: time
+    end_time: time
+    interval_minutes: int
+
+
 class SlotOut(BaseModel):
     id: int
     doctor_id: int
     datetime: datetime
-    is_booked: bool   # cast Integer (0/1) -> bool in response
+    is_booked: int
 
-    model_config = ConfigDict(from_attributes=True)
+    class Config:
+        orm_mode = True
 
 
 # -------------------------
-# APPOINTMENT SCHEMAS
+# Appointment Schemas
 # -------------------------
 class AppointmentBase(BaseModel):
     patient_name: str
     patient_email: EmailStr
 
-
 class AppointmentCreate(AppointmentBase):
     slot_id: int
 
-
-class AppointmentOut(AppointmentBase):
+class AppointmentOut(BaseModel):
     id: int
-    slot_id: int
+    patient_name: str
+    patient_email: EmailStr
     slot: SlotOut
     booked_at: datetime
 
-    model_config = ConfigDict(from_attributes=True)
+    class Config:
+        orm_mode = True
