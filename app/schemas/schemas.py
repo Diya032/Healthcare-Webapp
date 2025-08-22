@@ -191,3 +191,8 @@ class AppointmentOut(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class PatientAppointments(BaseModel):
+    upcoming: List[AppointmentOut]
+    past: List[AppointmentOut]

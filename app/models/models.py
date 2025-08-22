@@ -102,6 +102,7 @@ class Slot(Base):
     datetime = Column(DateTime, nullable=False)
     is_booked = Column(Integer, default=0)  # 0 = available, 1 = booked
 
+
     # ✅ backref to doctor
     doctor = relationship("Doctor", back_populates="slots")
 
@@ -127,3 +128,5 @@ class Appointment(Base):
     # Relationships
     patient = relationship("Patient", back_populates="appointments")
     slot = relationship("Slot", back_populates="appointment")
+
+
