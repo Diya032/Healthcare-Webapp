@@ -94,7 +94,10 @@ def list_slots_separated(doctor_id: int, db: Session = Depends(get_db)):
     for s in all_slots:
         if s["doctor_id"] != doctor_id:
             continue
-        if s["datetime"] >= now:
+        slot_dt = s["datetime"]
+        if slot_dt.tzinfo is None:
+            slot_dt = slot_dt.replace(tzinfo=timezone.utc)
+        if slot_dt >= now:
             future_slots.append(s)
         else:
             past_slots.append(s)

@@ -1,12 +1,13 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+import os
 
 # ----------------------------
 # Step 1a: Define Database URL
 # ----------------------------
 # Using SQLite for local POC; database file will be created automatically
-SQLALCHEMY_DATABASE_URL = "sqlite:///./patients.db"
+SQLALCHEMY_DATABASE_URL = f"sqlite:///{os.path.abspath('patients.db')}"
 
 # ----------------------------
 # Step 1b: Create Engine

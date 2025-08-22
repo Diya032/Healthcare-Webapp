@@ -55,7 +55,7 @@ def book_appointment(
             db=db,
             patient_id=patient.id,
             slot_id=payload.slot_id,
-            reason=getattr(payload, "reason", None)
+            # reason=getattr(payload, "reason", None)
         )
     except ValueError as e:
         raise HTTPException(status_code=409, detail=str(e))

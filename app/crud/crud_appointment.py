@@ -53,7 +53,7 @@ def get_slot_by_id(db: Session, slot_id: int):
 # -----------------------------
 # Appointment CRUD
 # -----------------------------
-def create_appointment(db: Session, patient_id: int, slot_id: int, reason: str = None):
+def create_appointment(db: Session, patient_id: int, slot_id: int):
     slot = get_slot_by_id(db, slot_id)
     if not slot:
         raise ValueError("Slot does not exist")
@@ -73,7 +73,7 @@ def create_appointment(db: Session, patient_id: int, slot_id: int, reason: str =
         patient_id=patient_id,
         slot_id=slot_id,
         booked_at=datetime.now(timezone.utc),
-        reason=reason
+        # reason=reason
     )
     slot.is_booked = 1
     try:

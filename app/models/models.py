@@ -122,7 +122,7 @@ class Appointment(Base):
 
     # Link to Slot (1:1: one slot = one appointment max)
     slot_id = Column(Integer, ForeignKey("slots.id", ondelete="CASCADE"), nullable=False, unique=True, index=True)
-
+    reason = Column(Text, nullable=True)  # New field for reason of visit
     booked_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     # Relationships
