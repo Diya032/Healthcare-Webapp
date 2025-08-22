@@ -1,0 +1,1 @@
+# Centralized CORS origins
