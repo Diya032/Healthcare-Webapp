@@ -39,21 +39,29 @@ def round_to_interval(dt: datetime, interval_minutes: int):
     )
     return dt - discard
 
-def create_slot(db: Session, payload: schemas.SlotCreate, doctor_id: int) -> models.Slot:
+def create_slot(db: Session, payload: schemas.SlotCreate, doctor_id: int) -> dict:
     """
     Create a slot for a given doctor.
+    Returns a dictionary ready for SlotOut schema.
     """
     aligned_time = round_to_interval(payload.datetime, 30)
 
     # Check if slot already exists
-    existing = db.query(models.Slot).filter(
-        models.Slot.doctor_id == doctor_id,
-        models.Slot.datetime == aligned_time
+    existing = db.query(Slot).filter(
+        Slot.doctor_id == doctor_id,
+        Slot.datetime == aligned_time
     ).first()
     if existing:
-        return existing  # or raise an error if you want uniqueness
+        return {
+            "id": existing.id,
+            "doctor_id": existing.doctor_id,
+            "datetime": existing.datetime,
+            "is_booked": existing.is_booked,
+            "doctor_name": existing.doctor.name,
+            "specialty": existing.doctor.specialty
+        }
 
-    slot = models.Slot(
+    slot = Slot(
         doctor_id=doctor_id,
         datetime=aligned_time,
         is_booked=0
@@ -61,9 +69,30 @@ def create_slot(db: Session, payload: schemas.SlotCreate, doctor_id: int) -> mod
     db.add(slot)
     db.commit()
     db.refresh(slot)
-    return slot
+
+    return {
+        "id": slot.id,
+        "doctor_id": slot.doctor_id,
+        "datetime": slot.datetime,
+        "is_booked": slot.is_booked,
+        "doctor_name": slot.doctor.name,
+        "specialty": slot.doctor.specialty
+    }
+
+
 
 
 def get_all_slots(db: Session):
-    """Return all slots in the database"""
-    return db.query(Slot).all()
+    """Return all slots in the database with doctor info"""
+    db_slots = db.query(Slot).all()  # keep original DB query
+    slots = []
+    for s in db_slots:
+        slots.append({
+            "id": s.id,
+            "doctor_id": s.doctor_id,
+            "datetime": s.datetime,
+            "is_booked": s.is_booked,
+            "doctor_name": s.doctor.name,
+            "specialty": s.doctor.specialty
+        })
+    return slots

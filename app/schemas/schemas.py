@@ -163,6 +163,8 @@ class SlotOut(BaseModel):
     doctor_id: int
     datetime: datetime
     is_booked: int
+    doctor_name: str
+    specialty: str
 
     class Config:
         orm_mode = True
@@ -171,12 +173,13 @@ class SlotOut(BaseModel):
 # -------------------------
 # Appointment Schemas
 # -------------------------
-class AppointmentBase(BaseModel):
-    patient_name: str
-    patient_email: EmailStr
+# class AppointmentBase(BaseModel):
+#     patient_name: str
+#     patient_email: EmailStr
 
-class AppointmentCreate(AppointmentBase):
+class AppointmentCreate(BaseModel):
     slot_id: int
+    reason: Optional[str] = None
 
 class AppointmentOut(BaseModel):
     id: int
@@ -184,6 +187,7 @@ class AppointmentOut(BaseModel):
     patient_email: EmailStr
     slot: SlotOut
     booked_at: datetime
+    reason: Optional[str] = None
 
     class Config:
         orm_mode = True

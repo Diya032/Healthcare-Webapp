@@ -41,6 +41,6 @@ def add_slot(doctor_id: int, payload: SlotCreate, db: Session = Depends(get_db))
 # -------------------------
 @router.get("/doctors/{doctor_id}/slots", response_model=List[SlotOut])
 def list_slots(doctor_id: int, db: Session = Depends(get_db)):
-    slots = crud_admin.get_all_slots(db)
+    all_slots = crud_admin.get_all_slots(db)
     # Filter only slots for the requested doctor
-    return [s for s in slots if s.doctor_id == doctor_id]
+    return [s for s in all_slots if s["doctor_id"] == doctor_id]

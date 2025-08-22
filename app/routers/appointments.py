@@ -64,8 +64,8 @@ def book_appointment(
 
     return AppointmentOut(
         id=appointment.id,
-        patient_name=patient_obj.name,
-        patient_email=patient_obj.email,
+        # patient_name=patient_obj.name,
+        # patient_email=patient_obj.email,
         slot=SlotOut(
             id=appointment.slot.id,
             doctor_id=appointment.slot.doctor_id,
