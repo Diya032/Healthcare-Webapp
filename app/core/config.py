@@ -15,6 +15,18 @@ from typing import Optional
 
 
 class Settings(BaseSettings):
+
+    # ----------------------------
+    # Database
+    # ----------------------------
+    DATABASE_URL: str = Field(
+        default="sqlite:///./patients.db",
+        description="Database connection URL (SQLAlchemy format)."
+    )
+
+    # ----------------------------
+    # JWT / Authentication
+    # ----------------------------
     # IMPORTANT: In production, set this in environment (DO NOT hardcode)
     SECRET_KEY: str = Field(
         default="change-me-in-prod-very-secret-and-long-string",
@@ -33,6 +45,9 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"   # local convenience: read env vars from .env if present
+        env: str = "development"
+        dev_cors: str = "http://localhost:3000"
+        prod_cors: str = "https://myfrontend.com"
         env_file_encoding = "utf-8"
 
 

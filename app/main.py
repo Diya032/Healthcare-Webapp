@@ -28,6 +28,10 @@ app = FastAPI(
     description="API for managing patients in healthcare system"
 )
 
+# Import and set up CORS middleware
+from app.core.cors import setup_cors
+app = setup_cors(app)
+
 # ----------------------------
 # Step 1c: Include Routers
 # ----------------------------
