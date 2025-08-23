@@ -14,6 +14,26 @@ from pydantic import Field
 from typing import Optional
 
 
+#-----------------------------
+#adding one source of truth of db url
+import os
+from dotenv import load_dotenv
+# load_dotenv()  # take environment variables from .env.
+
+# Only load .env in local/dev environment
+if os.getenv("ENVIRONMENT", "development") == "development":
+    load_dotenv()  # loads .env
+
+# Single source of truth for DB URL
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    f"sqlite:///{os.path.abspath('patients.db')}"   # fallback if not set
+)
+
+#-----------------------------
+
+#-----------------------------
+# App Settings
 class Settings(BaseSettings):
     # IMPORTANT: In production, set this in environment (DO NOT hardcode)
     SECRET_KEY: str = Field(
