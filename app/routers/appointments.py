@@ -2,13 +2,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 
-from app.models.models import Patient
-from app.schemas.schemas import SlotOut, AppointmentCreate, AppointmentOut
+from app.models.models import Patient, Appointment, Slot
+from app.schemas.schemas import SlotOut, AppointmentCreate, AppointmentOut, PatientAppointments
 from app.core.dependencies import get_current_patient_or_409
 from app.core.database import get_db
-from app.crud import crud_appointment as crud  # corrected import
+from app.crud import crud_appointment as crud
 
 router = APIRouter(prefix="/appointments", tags=["Appointments"])
 
@@ -40,6 +40,7 @@ def list_available_slots(
         for s in slots
     ]
 
+
 # -------------------------------
 # Book an appointment
 # -------------------------------
@@ -54,18 +55,16 @@ def book_appointment(
             db=db,
             patient_id=patient.id,
             slot_id=payload.slot_id,
-            reason=getattr(payload, "reason", None)
+            # reason=getattr(payload, "reason", None)
         )
     except ValueError as e:
         raise HTTPException(status_code=409, detail=str(e))
 
-    # Fetch the patient object
-    patient_obj = db.query(Patient).filter(Patient.id == appointment.patient_id).first()
-
     return AppointmentOut(
         id=appointment.id,
-        patient_name=patient_obj.name,
-        patient_email=patient_obj.email,
+        patient_name=patient.name,
+        patient_email=patient.email,
+        reason=getattr(appointment, "reason", None),
         slot=SlotOut(
             id=appointment.slot.id,
             doctor_id=appointment.slot.doctor_id,
@@ -77,21 +76,25 @@ def book_appointment(
         booked_at=appointment.booked_at
     )
 
-# -------------------------------
-# View current patient's appointments
-# -------------------------------
-@router.get("/me", response_model=List[AppointmentOut])
-def get_my_appointments(
-    patient: Patient = Depends(get_current_patient_or_409),
-    db: Session = Depends(get_db)
-):
-    appointments = crud.get_patient_appointments(db, patient.id)
 
-    return [
-        AppointmentOut(
+# -------------------------------
+# View current patient's appointments (upcoming & past)
+# -------------------------------
+@router.get("/me", response_model=PatientAppointments)
+@router.get("/me", response_model=PatientAppointments)
+def get_my_appointments(
+    db: Session = Depends(get_db),
+    patient: Patient = Depends(get_current_patient_or_409)
+):
+    upcoming = crud.get_patient_appointments(db, patient.id, only_future=True)
+    past = crud.get_patient_appointments(db, patient.id, only_future=False)
+
+    def to_out(a):
+        return AppointmentOut(
             id=a.id,
             patient_name=patient.name,
             patient_email=patient.email,
+            reason=getattr(a, "reason", None),
             slot=SlotOut(
                 id=a.slot.id,
                 doctor_id=a.slot.doctor_id,
@@ -102,8 +105,13 @@ def get_my_appointments(
             ),
             booked_at=a.booked_at
         )
-        for a in appointments
-    ]
+
+    return PatientAppointments(
+        upcoming=[to_out(a) for a in upcoming],
+        past=[to_out(a) for a in past]
+    )
+
+
 
 # -------------------------------
 # Cancel an appointment
