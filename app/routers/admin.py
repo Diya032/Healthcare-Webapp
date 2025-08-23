@@ -102,3 +102,39 @@ def list_slots_separated(doctor_id: int, db: Session = Depends(get_db)):
         else:
             past_slots.append(s)
     return {"future": future_slots, "past": past_slots}
+
+
+@router.put("/doctors/{doctor_id}", response_model=DoctorOut)
+def update_doctor(doctor_id: int, payload: DoctorCreate, db: Session = Depends(get_db)):
+    doctor = crud_admin.update_doctor(db, doctor_id, name=payload.name, specialty=payload.specialty)
+    if not doctor:
+        raise HTTPException(status_code=404, detail="Doctor not found")
+    return doctor
+
+@router.delete("/doctors/{doctor_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_doctor(doctor_id: int, db: Session = Depends(get_db)):
+    success = crud_admin.delete_doctor(db, doctor_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Doctor not found")
+    return None
+
+@router.put("/slots/{slot_id}", response_model=SlotOut)
+def update_slot(slot_id: int, payload: SlotCreate, db: Session = Depends(get_db)):
+    slot = crud_admin.update_slot(db, slot_id, new_datetime=payload.datetime)
+    if not slot:
+        raise HTTPException(status_code=404, detail="Slot not found")
+    return slot
+
+@router.delete("/slots/{slot_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_slot(slot_id: int, db: Session = Depends(get_db)):
+    success = crud_admin.delete_slot(db, slot_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Slot not found")
+    return None
+
+@router.delete("/doctors/{doctor_id}/slots/future", status_code=status.HTTP_204_NO_CONTENT)
+def delete_future_slots(doctor_id: int, days: int = 30, db: Session = Depends(get_db)):
+    deleted_count = crud_admin.delete_future_slots_for_doctor(db, doctor_id, days)
+    if deleted_count == 0:
+        raise HTTPException(status_code=404, detail="No future slots found to delete")
+    return {"deleted_slots": deleted_count}

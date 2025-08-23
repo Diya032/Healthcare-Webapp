@@ -28,10 +28,11 @@ def get_all_doctors(db: Session):
     """
     return db.query(models.Doctor).order_by(models.Doctor.name).all()
 
+# Update doctor
 def update_doctor(db: Session, doctor_id: int, name: str = None, specialty: str = None):
-    doctor = db.query(models.Doctor).filter(models.Doctor.id == doctor_id).first()
+    doctor = db.query(Doctor).filter(Doctor.id == doctor_id).first()
     if not doctor:
-        return None
+        raise HTTPException(status_code=404, detail="Doctor not found")
     if name:
         doctor.name = name
     if specialty:
@@ -40,13 +41,15 @@ def update_doctor(db: Session, doctor_id: int, name: str = None, specialty: str 
     db.refresh(doctor)
     return doctor
 
+# Delete doctor and all related slots
 def delete_doctor(db: Session, doctor_id: int):
-    doctor = db.query(models.Doctor).filter(models.Doctor.id == doctor_id).first()
+    doctor = db.query(Doctor).filter(Doctor.id == doctor_id).first()
     if not doctor:
-        return None
+        raise HTTPException(status_code=404, detail="Doctor not found")
     db.delete(doctor)
     db.commit()
     return True
+
 
 
 # -----------------------------
@@ -197,6 +200,56 @@ def get_all_slots(db: Session, only_future: bool = True) -> List[dict]:
             "specialty": s.doctor.specialty
         })
     return slots_out
+
+# Update a slot (datetime or availability)
+def update_slot(db: Session, slot_id: int, new_datetime: datetime = None, is_booked: int = None):
+    slot = db.query(Slot).filter(Slot.id == slot_id).first()
+    if not slot:
+        raise HTTPException(status_code=404, detail="Slot not found")
+    
+    if new_datetime:
+        slot.datetime = new_datetime
+    if is_booked is not None:
+        slot.is_booked = is_booked
+    
+    db.commit()
+    db.refresh(slot)
+    return {
+        "id": slot.id,
+        "doctor_id": slot.doctor_id,
+        "datetime": slot.datetime,
+        "is_booked": slot.is_booked,
+        "doctor_name": slot.doctor.name,
+        "specialty": slot.doctor.specialty
+    }
+
+# Delete a slot
+def delete_slot(db: Session, slot_id: int):
+    slot = db.query(Slot).filter(Slot.id == slot_id).first()
+    if not slot:
+        raise HTTPException(status_code=404, detail="Slot not found")
+    
+    db.delete(slot)
+    db.commit()
+    return True
+
+
+def delete_future_slots_for_doctor(db: Session, doctor_id: int, days: int):
+    now = datetime.utcnow()
+    end_date = now + timedelta(days=days)
+
+    slots = db.query(Slot).filter(
+        Slot.doctor_id == doctor_id,
+        Slot.datetime >= now,
+        Slot.datetime <= end_date
+    ).all()
+
+    for s in slots:
+        db.delete(s)
+    db.commit()
+    return len(slots)  # number of deleted slots
+
+
 
 
 
