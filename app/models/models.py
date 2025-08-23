@@ -99,7 +99,7 @@ class Slot(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     doctor_id = Column(Integer, ForeignKey("doctors.id", ondelete="CASCADE"), nullable=False)
-    datetime = Column(DateTime, nullable=False)
+    datetime = Column(DateTime(timezone=True), nullable=False)
     is_booked = Column(Integer, default=0)  # 0 = available, 1 = booked
 
 

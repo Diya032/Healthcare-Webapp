@@ -20,17 +20,33 @@ def round_to_interval(dt: datetime, interval_minutes: int):
 # -----------------------------
 # Slots CRUD
 # -----------------------------
+# Optional: Expand this dictionary with common synonyms/keywords
+SPECIALTY_MAP = {
+    "heart": "Cardiology",
+    "cardio": "Cardiology",
+    "skin": "Dermatology",
+    "derma": "Dermatology",
+    "bones": "Orthopedics",
+    "bone": "Orthopedics",
+    "eyes": "Ophthalmology",
+    "eye": "Ophthalmology",
+}
+
 def get_available_slots(db: Session, specialty: str = None, date: str = None):
     now = datetime.now(timezone.utc)
     query = db.query(models.Slot).join(models.Doctor)
 
     if specialty:
-        query = query.filter(models.Doctor.specialty == specialty)
+        # query = query.filter(models.Doctor.specialty == specialty)
+        normalized = SPECIALTY_MAP.get(specialty.lower(), specialty)
+        query = query.filter(models.Doctor.specialty.ilike(f"%{normalized}%"))
     if date:
-        start_date = datetime.strptime(date, "%Y-%m-%d").replace(tzinfo=timezone.utc)
-        end_date = start_date + timedelta(days=1)
-        query = query.filter(models.Slot.datetime >= start_date,
-                             models.Slot.datetime < end_date)
+        date_obj = datetime.strptime(date, "%Y-%m-%d").date()
+        start = datetime.combine(date_obj, datetime.min.time()).replace(tzinfo=timezone.utc)
+        end = datetime.combine(date_obj, datetime.max.time()).replace(tzinfo=timezone.utc) 
+        # start_date = datetime.strptime(date, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+        # end_date = start_date + timedelta(days=1)
+        query = query.filter(models.Slot.datetime >= start, models.Slot.datetime < end)
 
     # Only future slots
     query = query.filter(models.Slot.is_booked == 0, models.Slot.datetime >= now)
@@ -53,7 +69,7 @@ def get_slot_by_id(db: Session, slot_id: int):
 # -----------------------------
 # Appointment CRUD
 # -----------------------------
-def create_appointment(db: Session, patient_id: int, slot_id: int):
+def create_appointment(db: Session, patient_id: int, slot_id: int, reason: str = None):
     slot = get_slot_by_id(db, slot_id)
     if not slot:
         raise ValueError("Slot does not exist")
@@ -73,7 +89,7 @@ def create_appointment(db: Session, patient_id: int, slot_id: int):
         patient_id=patient_id,
         slot_id=slot_id,
         booked_at=datetime.now(timezone.utc),
-        # reason=reason
+        reason=reason
     )
     slot.is_booked = 1
     try:
