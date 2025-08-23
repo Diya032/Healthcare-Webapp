@@ -30,7 +30,11 @@ app = FastAPI(
 
 # Import and set up CORS middleware
 from app.core.cors import setup_cors
+from app.core.debug_options_cors import OptionsDebugMiddleware
 app = setup_cors(app)
+
+# Apply OPTIONS debug middleware next
+app.add_middleware(OptionsDebugMiddleware)
 
 # ----------------------------
 # Step 1c: Include Routers

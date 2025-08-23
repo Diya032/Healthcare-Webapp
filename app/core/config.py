@@ -1,12 +1,9 @@
-# Config settings. Handles DB URL, env variables, and app config. 
-# pydantic settings: SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
-
 # app/core/config.py
 """
 Application configuration using Pydantic BaseSettings.
 
-This centralizes SECRET_KEY, JWT algorithm, and token TTL, and
-loads from environment variables (recommended for production).
+Centralizes DB URL, JWT settings, and CORS origins.
+Development uses ngrok for remote frontend access.
 """
 
 from pydantic_settings import BaseSettings
@@ -15,7 +12,6 @@ from typing import Optional
 
 
 class Settings(BaseSettings):
-
     # ----------------------------
     # Database
     # ----------------------------
@@ -27,27 +23,30 @@ class Settings(BaseSettings):
     # ----------------------------
     # JWT / Authentication
     # ----------------------------
-    # IMPORTANT: In production, set this in environment (DO NOT hardcode)
     SECRET_KEY: str = Field(
         default="change-me-in-prod-very-secret-and-long-string",
         description="Secret key used to sign JWTs (HS256). Replace in prod."
     )
-
-    # JWT algorithm. HS256 is typical for symmetric-signature.
     ALGORITHM: str = Field(default="HS256", description="JWT signing algorithm")
-
-    # Access token TTL in minutes (short-lived tokens). Typical values: 15, 30, 60.
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=30, description="Access token lifetime (minutes)")
+    JWT_ISSUER: Optional[str] = Field(default=None, description="Optional JWT issuer claim")
+    JWT_AUDIENCE: Optional[str] = Field(default=None, description="Optional JWT audience claim")
 
-    # Optional issuer/audience may want to validate later (B2C integration).
-    JWT_ISSUER: Optional[str] = Field(default=None, description="Optional JWT issuer claim to validate")
-    JWT_AUDIENCE: Optional[str] = Field(default=None, description="Optional JWT audience claim to validate")
+    # ----------------------------
+    # Environment & CORS
+    # ----------------------------
+    env: str = Field(default="development", description="Current environment: development or production")
+    dev_cors: str = Field(
+        default= "https://ab37c26da88c.ngrok-free.app",
+        description="Dev CORS origins (ngrok URL for remote frontend)"
+    )
+    prod_cors: str = Field(
+        default="https://myfrontend.com",
+        description="Prod CORS origins (your real frontend domain)"
+    )
 
     class Config:
-        env_file = ".env"   # local convenience: read env vars from .env if present
-        env: str = "development"
-        dev_cors: str = "http://localhost:3000"
-        prod_cors: str = "https://myfrontend.com"
+        env_file = ".env"
         env_file_encoding = "utf-8"
 
 
