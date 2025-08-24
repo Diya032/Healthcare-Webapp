@@ -12,6 +12,7 @@ loads from environment variables (recommended for production).
 from pydantic_settings import BaseSettings
 from pydantic import Field
 from typing import Optional
+from urllib.parse import quote_plus
 
 
 #-----------------------------
@@ -24,17 +25,31 @@ from dotenv import load_dotenv
 if os.getenv("ENVIRONMENT", "development") == "development":
     load_dotenv()  # loads .env
 
-# Single source of truth for DB URL
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    f"sqlite:///{os.path.abspath('patients.db')}"   # fallback if not set
-)
 
+# ----------------------------
+# Database URL builder (handles special chars in password)
+# ----------------------------
+user = "healthcare_db_server"
+password = quote_plus("Health123")  # quote_plus handles special characters
+server = "sqlhealthcareserver.database.windows.net"
+database = "healthcare_sql_db"
+
+# Single source of truth for DB URL
+# DATABASE_URL = os.getenv(
+#     "DATABASE_URL",
+#     f"sqlite:///{os.path.abspath('patients.db')}"   # fallback if not set
+# )
+
+DATABASE_URL = (
+    f"mssql+pyodbc://{user}:{password}@{server}:1433/{database}"
+    "?driver=ODBC+Driver+18+for+SQL+Server&Encrypt=yes&TrustServerCertificate=no"
+)
 #-----------------------------
 
 #-----------------------------
 # App Settings
 class Settings(BaseSettings):
+    DATABASE_URL: str = Field(default=DATABASE_URL, description="Database connection URL")
     # IMPORTANT: In production, set this in environment (DO NOT hardcode)
     SECRET_KEY: str = Field(
         default="change-me-in-prod-very-secret-and-long-string",
@@ -54,6 +69,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"   # local convenience: read env vars from .env if present
         env_file_encoding = "utf-8"
+        extra = "allow"  # ignore other unexpected env vars
 
 
 # singleton settings object to import across the app

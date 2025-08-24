@@ -17,7 +17,7 @@ from app.core.config import DATABASE_URL
 # connect_args={"check_same_thread": False} is required only for SQLite
 engine = create_engine(
     DATABASE_URL,
-    connect_args={"check_same_thread": False if DATABASE_URL.startswith("sqlite") else {}}
+    connect_args={"check_same_thread": False}
 )
 
 
