@@ -20,8 +20,8 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, nullable=False, unique=True, index=True)  # single source of truth for email
-    hashed_password = Column(String, nullable=False)                  # keep existing hashes as-is
+    email = Column(String(255), nullable=False, unique=True, index=True)  # single source of truth for email
+    hashed_password = Column(String(255), nullable=False)                  # keep existing hashes as-is
     is_active = Column(Boolean, nullable=False, server_default="1")   # simple active flag
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
@@ -40,16 +40,16 @@ class Patient(Base):
     id = Column(Integer, primary_key=True, index=True)
 
     # NEW in Phase 2:
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="RESTRICT"), nullable=False, unique=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="NO ACTION"), nullable=False, unique=True, index=True)
 
     # --- Domain profile fields (keep what you already had; sample below) ---
-    name = Column(String, nullable=True)
+    name = Column(String(255), nullable=True)
     age = Column(Integer, nullable=True)
     dob = Column(Date, nullable=True)
-    gender = Column(String, nullable=True)
+    gender = Column(String(255), nullable=True)
     contact_number = Column(String, nullable=True)
-    email = Column(String, nullable = True, )
-    address = Column(String, nullable=True)
+    email = Column(String(255), nullable = True, )
+    address = Column(String(255), nullable=True)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
@@ -70,12 +70,12 @@ class MedicalHistory(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     patient_id = Column(Integer, ForeignKey("patients.id", ondelete="CASCADE"), nullable=False, index=True)
-    condition = Column(String, nullable=False)
+    condition = Column(String(255), nullable=False)
     diagnosis_date = Column(Date, nullable=True)
-    medications = Column(String, nullable=True)
-    allergies = Column(String, nullable= True)
-    treatment = Column(String, nullable= True)
-    notes = Column(String, nullable=True)
+    medications = Column(String(255), nullable=True)
+    allergies = Column(String(255), nullable= True)
+    treatment = Column(String(255), nullable= True)
+    notes = Column(String(255), nullable=True)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
@@ -87,8 +87,8 @@ class Doctor(Base):
     __tablename__ = "doctors"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    specialty = Column(String, nullable=False)
+    name = Column(String(255), nullable=False)
+    specialty = Column(String(255), nullable=False)
 
     # ✅ one-to-many with slots
     slots = relationship("Slot", back_populates="doctor", cascade="all, delete-orphan")
@@ -99,7 +99,7 @@ class Slot(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     doctor_id = Column(Integer, ForeignKey("doctors.id", ondelete="CASCADE"), nullable=False)
-    datetime = Column(DateTime, nullable=False)
+    datetime = Column(DateTime(timezone=True), nullable=False)
     is_booked = Column(Integer, default=0)  # 0 = available, 1 = booked
 
 

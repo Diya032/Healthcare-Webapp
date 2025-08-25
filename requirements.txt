@@ -13,4 +13,5 @@ pytest
 # jwt
 pydantic-settings
 python-multipart
+alembic
 
