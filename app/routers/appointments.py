@@ -107,7 +107,7 @@ def book_appointment(
 # -------------------------------
 # View current patient's appointments (upcoming & past)
 # -------------------------------
-@router.get("/me", response_model=PatientAppointments)
+
 @router.get("/me", response_model=PatientAppointments)
 def get_my_appointments(
     db: Session = Depends(get_db),

@@ -6,7 +6,7 @@ import os
 # ----------------------------
 # Step 1a: Define Database URL
 # ----------------------------
-from app.core.config import DATABASE_URL
+from .config import settings
 # Using SQLite for local POC; database file will be created automatically
 # SQLALCHEMY_DATABASE_URL = f"sqlite:///{os.path.abspath('patients.db')}"
 
@@ -16,7 +16,7 @@ from app.core.config import DATABASE_URL
 # The engine connects SQLAlchemy to the database
 # connect_args={"check_same_thread": False} is required only for SQLite
 engine = create_engine(
-    DATABASE_URL,
+    settings.DATABASE_URL,
     connect_args={"check_same_thread": False}
 )
 

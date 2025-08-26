@@ -1,80 +1,63 @@
-# Config settings. Handles DB URL, env variables, and app config. 
-# pydantic settings: SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
 # app/core/config.py
 """
-Application configuration using Pydantic BaseSettings.
-
-This centralizes SECRET_KEY, JWT algorithm, and token TTL, and
-loads from environment variables (recommended for production).
+Centralized application configuration using Pydantic BaseSettings.
+Loads from environment variables, with .env support only in local dev.
 """
 
+import os
 from pydantic_settings import BaseSettings
 from pydantic import Field
 from typing import Optional
-from urllib.parse import quote_plus
+# from urllib.parse import quote_plus
 
-
-#-----------------------------
-#adding one source of truth of db url
-import os
-from dotenv import load_dotenv
-# load_dotenv()  # take environment variables from .env.
 
 # Only load .env in local/dev environment
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development").lower()
 if ENVIRONMENT == "development":
+    from dotenv import load_dotenv
     load_dotenv()
 
-
-
-# ----------------------------
-# Database URL builder (handles special chars in password)
-# ----------------------------
-# user = "healthcare_db_server"
-# password = quote_plus(os.getenv("DATABASE_PASSWORD", ""))  # quote_plus handles special characters
-# server = "sqlhealthcareserver.database.windows.net"
-# database = "healthcare_sql_db"
-
-# Single source of truth for DB URL
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    f"sqlite:///{os.path.abspath('patients.db')}"   # fallback if not set
-)
-
-# DATABASE_URL = (
-#     f"mssql+pyodbc://{user}:{password}@{server}:1433/{database}"
-#     "?driver=ODBC+Driver+18+for+SQL+Server&Encrypt=yes&TrustServerCertificate=no"
-# )
-#-----------------------------
-
-#-----------------------------
 # App Settings
+#-----------------------------
 class Settings(BaseSettings):
-    DATABASE_URL: str = Field(default=DATABASE_URL, description="Database connection URL")
-    ACS_CONNECTION_STRING: str 
-    ACS_SENDER_EMAIL: str 
-    # IMPORTANT: In production, set this in environment (DO NOT hardcode)
+    # -------------------
+    # Database
+    # -------------------
+    DATABASE_URL: str = Field(..., description="Database connection URL", alias="DATABASE-URL")
+
+    # -------------------
+    # Azure Communication Service
+    # -------------------
+    ACS_CONNECTION_STRING: str = Field(..., description="Azure Communication Services connection string", alias="ACS-CONNECTION-STRING")
+    ACS_SENDER_EMAIL: str = Field(..., description="ACS verified sender email", alias="ACS-SENDER-EMAIL")
+
+    # -------------------
+    # JWT Auth
+    # -------------------
     SECRET_KEY: str = Field(
-        default="change-me-in-prod-very-secret-and-long-string",
-        description="Secret key used to sign JWTs (HS256). Replace in prod."
-    )
+        ...,
+        description="Secret key used to sign JWTs (HS256). Replace in production!",
+        alias="SECRET-KEY")
 
-    # JWT algorithm. HS256 is typical for symmetric-signature.
     ALGORITHM: str = Field(default="HS256", description="JWT signing algorithm")
-
-    # Access token TTL in minutes (short-lived tokens). Typical values: 15, 30, 60.
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=30, description="Access token lifetime (minutes)")
 
-    # Optional issuer/audience may want to validate later (B2C integration).
-    JWT_ISSUER: Optional[str] = Field(default=None, description="Optional JWT issuer claim to validate")
-    JWT_AUDIENCE: Optional[str] = Field(default=None, description="Optional JWT audience claim to validate")
+    # Optional fields for B2C later
+    JWT_ISSUER: Optional[str] = None
+    JWT_AUDIENCE: Optional[str] = None
+
+    # -------------------
+    # CORS
+    # -------------------
+    DEV_CORS_ORIGINS: str = Field("*, null", description="Comma-separated list of allpwed CORS origins in development")
+    # PROD_CORS_ORIGINS:str = Field(..., description="Comma-separated list of allowed CORS origins in production")
 
     class Config:
-        env_file = ".env"   # local convenience: read env vars from .env if present
+        env_file = ".env"  # local convenience
         env_file_encoding = "utf-8"
-        extra = "allow"  # ignore other unexpected env vars
+        extra = "ignore"   # ignore unexpected env vars
 
 
-# singleton settings object to import across the app
+# Singleton settings object, import and use everywhere
 settings = Settings()

@@ -1,6 +1,7 @@
 # FastAPI app entrypoint. Creates FastAPI instance, includes routers. 
 # Import FastAPI to create the API application
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+import time
 
 # Import models and database engine to initialize tables
 from .models import models
@@ -27,6 +28,27 @@ app = FastAPI(
     version="1.0",
     description="API for managing patients in healthcare system"
 )
+
+# Import and set up CORS middleware
+from app.core.cors import setup_cors
+from app.core.debug_options_cors import OptionsDebugMiddleware
+app = setup_cors(app)
+
+# Apply OPTIONS debug middleware next
+app.add_middleware(OptionsDebugMiddleware)
+
+# REQUEST LOGGING MIDDLEWARE - logs all requests and responses for debogging purposes
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start_time = time.time()
+    print(f"\n[REQUEST] {request.method} {request.url}")
+    print(f"[HEADERS] {dict(request.headers)}")
+    
+    response = await call_next(request)
+    
+    process_time = time.time() - start_time
+    print(f"[RESPONSE] Status: {response.status_code}, Time: {process_time:.2f}s")
+    return response
 
 # ----------------------------
 # Step 1c: Include Routers

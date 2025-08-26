@@ -224,6 +224,7 @@ __pycache__/
 venv/
 env/
 healthcare-env/
+keyvault-env/
 
 # ----------------------------
 # Environment variables
@@ -239,3 +240,4 @@ healthcare-env/
 .idea/
 *.swp
 *.swo
+Healthcare-Webapp.code-workspace

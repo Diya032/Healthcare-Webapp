@@ -14,4 +14,4 @@ pytest
 pydantic-settings
 python-multipart
 alembic
-
+azure.communication.email
