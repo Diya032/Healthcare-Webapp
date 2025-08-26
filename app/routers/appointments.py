@@ -44,11 +44,18 @@ def list_available_slots(
 # -------------------------------
 # Book an appointment
 # -------------------------------
+from fastapi import BackgroundTasks
+from fastapi import Depends, FastAPI
+from app.email_communication.acsemailservice import ACSEmailService
+from app.email_communication.appt_email_gen import generate_appointment_email   
+
 @router.post("/", response_model=AppointmentOut, status_code=status.HTTP_201_CREATED)
 def book_appointment(
     payload: AppointmentCreate,
+    *,
     patient: Patient = Depends(get_current_patient_or_409),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    background_tasks: BackgroundTasks 
 ):
     try:
         appointment = crud.create_appointment(
@@ -59,7 +66,26 @@ def book_appointment(
         )
     except ValueError as e:
         raise HTTPException(status_code=409, detail=str(e))
+    
+     # ---- Send confirmation email ----
+     # 2️⃣ Generate email HTML
+    html_content = generate_appointment_email(
+        patient_name=patient.name,
+        doctor_name=appointment.slot.doctor.name,
+        doctor_specialty=appointment.slot.doctor.specialty,
+        slot_datetime=appointment.slot.datetime
+    )
 
+    # 3️⃣ Send email in background
+    service = ACSEmailService()
+    background_tasks.add_task(
+        service.send_email,
+        appointment.patient.user.email,
+        f"Appointment Confirmation with Dr. {appointment.slot.doctor.name}",
+        html_content
+    )
+
+    # return response to frontend
     return AppointmentOut(
         id=appointment.id,
         patient_name=patient.name,
@@ -75,6 +101,7 @@ def book_appointment(
         ),
         booked_at=appointment.booked_at
     )
+
 
 
 # -------------------------------

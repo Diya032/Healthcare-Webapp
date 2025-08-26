@@ -22,34 +22,38 @@ from dotenv import load_dotenv
 # load_dotenv()  # take environment variables from .env.
 
 # Only load .env in local/dev environment
-if os.getenv("ENVIRONMENT", "development") == "development":
-    load_dotenv()  # loads .env
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development").lower()
+if ENVIRONMENT == "development":
+    load_dotenv()
+
 
 
 # ----------------------------
 # Database URL builder (handles special chars in password)
 # ----------------------------
-user = "healthcare_db_server"
-password = quote_plus("Health123")  # quote_plus handles special characters
-server = "sqlhealthcareserver.database.windows.net"
-database = "healthcare_sql_db"
+# user = "healthcare_db_server"
+# password = quote_plus(os.getenv("DATABASE_PASSWORD", ""))  # quote_plus handles special characters
+# server = "sqlhealthcareserver.database.windows.net"
+# database = "healthcare_sql_db"
 
 # Single source of truth for DB URL
-# DATABASE_URL = os.getenv(
-#     "DATABASE_URL",
-#     f"sqlite:///{os.path.abspath('patients.db')}"   # fallback if not set
-# )
-
-DATABASE_URL = (
-    f"mssql+pyodbc://{user}:{password}@{server}:1433/{database}"
-    "?driver=ODBC+Driver+18+for+SQL+Server&Encrypt=yes&TrustServerCertificate=no"
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    f"sqlite:///{os.path.abspath('patients.db')}"   # fallback if not set
 )
+
+# DATABASE_URL = (
+#     f"mssql+pyodbc://{user}:{password}@{server}:1433/{database}"
+#     "?driver=ODBC+Driver+18+for+SQL+Server&Encrypt=yes&TrustServerCertificate=no"
+# )
 #-----------------------------
 
 #-----------------------------
 # App Settings
 class Settings(BaseSettings):
     DATABASE_URL: str = Field(default=DATABASE_URL, description="Database connection URL")
+    ACS_CONNECTION_STRING: str 
+    ACS_SENDER_EMAIL: str 
     # IMPORTANT: In production, set this in environment (DO NOT hardcode)
     SECRET_KEY: str = Field(
         default="change-me-in-prod-very-secret-and-long-string",
