@@ -53,6 +53,18 @@ class Settings(BaseSettings):
     DEV_CORS_ORIGINS: str = Field("*, null", description="Comma-separated list of allpwed CORS origins in development")
     # PROD_CORS_ORIGINS:str = Field(..., description="Comma-separated list of allowed CORS origins in production")
 
+    # -------------------
+    # Azure Blob Storage
+    # -------------------
+    AZURE_STORAGE_ACCOUNT: str = Field(..., description="Azure Storage account name", alias="AZURE-STORAGE-ACCOUNT")
+    AZURE_STORAGE_KEY:str = Field(..., description="Azure Storage account key", alias="AZURE-STORAGE-KEY")
+
+    # -------------------
+    # Azure Form Recognizer
+    # -------------------
+    AZURE_FORM_RECOGNIZER_ENDPOINT: str = Field(..., description="Azure Form Recognizer endpoint", alias="AZURE-FORM-RECOGNIZER-ENDPOINT")
+    AZURE_FORM_RECOGNIZER_KEY: str = Field(..., description="Azure Form Recognizer key", alias="AZURE-FORM-RECOGNIZER-KEY")
+
     class Config:
         env_file = ".env"  # local convenience
         env_file_encoding = "utf-8"

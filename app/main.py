@@ -8,7 +8,7 @@ from .models import models
 from app.core.database import engine
 
 # Import routers (we’ll create patient routes later)
-from .routers import patients, auth, medicalhistory, appointments, admin
+from .routers import patients, auth, medicalhistory, appointments, admin, medical_documents, docu_intelligence
 
 # ----------------------------
 # Step 1a: Create Database Tables
@@ -79,6 +79,17 @@ app.include_router(
     admin.router,
     tags=["Admin"]
 ) # <- admin added
+
+app.include_router(
+    medical_documents.router, 
+    tags=["Medical Documents"]
+) # <- medical documents added
+
+app.include_router(
+    docu_intelligence.router, 
+    tags=["Document Intelligence"]
+) # <- document intelligence added
+
 
 # ----------------------------
 # Step 1d: Root Endpoint
