@@ -24,21 +24,20 @@ class Settings(BaseSettings):
     # -------------------
     # Database
     # -------------------
-    DATABASE_URL: str = Field(..., description="Database connection URL", alias="DATABASE-URL")
+    DATABASE_URL: str = Field(..., description="Database connection URL")
 
     # -------------------
     # Azure Communication Service
     # -------------------
-    ACS_CONNECTION_STRING: str = Field(..., description="Azure Communication Services connection string", alias="ACS-CONNECTION-STRING")
-    ACS_SENDER_EMAIL: str = Field(..., description="ACS verified sender email", alias="ACS-SENDER-EMAIL")
+    ACS_CONNECTION_STRING: str = Field(..., description="Azure Communication Services connection string")
+    ACS_SENDER_EMAIL: str = Field(..., description="ACS verified sender email")
 
     # -------------------
     # JWT Auth
     # -------------------
     SECRET_KEY: str = Field(
         ...,
-        description="Secret key used to sign JWTs (HS256). Replace in production!",
-        alias="SECRET-KEY")
+        description="Secret key used to sign JWTs (HS256). Replace in production!")
 
     ALGORITHM: str = Field(default="HS256", description="JWT signing algorithm")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=30, description="Access token lifetime (minutes)")
