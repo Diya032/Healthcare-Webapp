@@ -9,8 +9,6 @@ passlib[bcrypt]==1.7.4
 pydantic[email]
 python-jose[cryptography]
 pytest
-# PyJWT
-# jwt
 pydantic-settings
 python-multipart
 alembic
