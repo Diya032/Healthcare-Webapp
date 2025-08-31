@@ -48,10 +48,16 @@ class Settings(BaseSettings):
     JWT_AUDIENCE: Optional[str] = None
 
     # -------------------
-    # CORS
+    # CORS - Fixed for Azure App Service
     # -------------------
-    DEV_CORS_ORIGINS: str = Field("*, null", description="Comma-separated list of allpwed CORS origins in development")
-    PROD_CORS_ORIGINS:str = Field("*", description="Comma-separated list of allowed CORS origins in production")
+    DEV_CORS_ORIGINS: str = Field(
+        default="*, null", 
+        description="Comma-separated list of allowed CORS origins in development"
+    )
+    PROD_CORS_ORIGINS: str = Field(
+        default="*", 
+        description="Comma-separated list of allowed CORS origins in production"
+    )
 
     # ENV
     ENVIRONMENT: str = Field(ENVIRONMENT, description="Environment: development or production")
@@ -60,6 +66,9 @@ class Settings(BaseSettings):
         env_file = ".env"  # local convenience
         env_file_encoding = "utf-8"
         extra = "ignore"   # ignore unexpected env vars
+        # Add these for Azure App Service compatibility
+        case_sensitive = False
+        env_prefix = ""
 
 
 # Singleton settings object, import and use everywhere
@@ -74,20 +83,32 @@ logger = logging.getLogger(__name__)
 
 class _LazySettings:
     _settings: Optional[Settings] = None
-
+    
     def __getattr__(self, name):
         if self._settings is None:
-            self._settings = Settings()
-            # Log key environment/config values once
-            logger.info(f"[Settings] ENVIRONMENT={self._settings.ENVIRONMENT}")
-            logger.info(f"[Settings] DEV_CORS_ORIGINS={self._settings.DEV_CORS_ORIGINS}")
-            logger.info(f"[Settings] PROD_CORS_ORIGINS={self._settings.PROD_CORS_ORIGINS}")
-            logger.info(f"[Settings] DATABASE_URL={self._settings.DATABASE_URL}")
-
-            # optionally log masked or presence info for sensitive keys
-            logger.info(f"[Settings] ACS_CONNECTION_STRING is set: {bool(self._settings.ACS_CONNECTION_STRING)}")
-            logger.info(f"[Settings] SECRET_KEY is set: {bool(self._settings.SECRET_KEY)}")
+            try:
+                # Add debug logging for Azure App Service
+                logger.info("Initializing settings...")
+                logger.info(f"Environment variables available: {list(os.environ.keys())}")
+                
+                self._settings = Settings()
+                
+                # Log key environment/config values once
+                logger.info(f"[Settings] ENVIRONMENT={self._settings.ENVIRONMENT}")
+                logger.info(f"[Settings] DEV_CORS_ORIGINS={self._settings.DEV_CORS_ORIGINS}")
+                logger.info(f"[Settings] PROD_CORS_ORIGINS={self._settings.PROD_CORS_ORIGINS}")
+                logger.info(f"[Settings] DATABASE_URL={'***masked***' if self._settings.DATABASE_URL else 'NOT SET'}")
+                
+                # Log masked or presence info for sensitive keys
+                logger.info(f"[Settings] ACS_CONNECTION_STRING is set: {bool(self._settings.ACS_CONNECTION_STRING)}")
+                logger.info(f"[Settings] SECRET_KEY is set: {bool(self._settings.SECRET_KEY)}")
+                
+            except Exception as e:
+                logger.error(f"Failed to initialize settings: {e}")
+                logger.error(f"Environment: {os.getenv('ENVIRONMENT')}")
+                logger.error(f"PROD_CORS_ORIGINS env var: {os.getenv('PROD_CORS_ORIGINS')}")
+                raise
+                
         return getattr(self._settings, name)
-
 
 settings = _LazySettings()
