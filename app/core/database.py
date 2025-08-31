@@ -17,7 +17,7 @@ from .config import settings
 # connect_args={"check_same_thread": False} is required only for SQLite
 engine = create_engine(
     settings.DATABASE_URL,
-    connect_args={"check_same_thread": False}
+    # connect_args={"check_same_thread": False}
 )
 
 
