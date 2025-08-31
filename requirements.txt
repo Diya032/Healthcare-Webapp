@@ -1,16 +1,15 @@
 # Python dependencies (FastAPI, SQLAlchemy, etc.). 
 # Dependencies for this service only  
 
-fastapi
-uvicorn
-sqlalchemy
-pydantic
+fastapi==0.116.1
+uvicorn==0.35.0
+sqlalchemy==2.0.43
+pydantic==2.11.7
 passlib[bcrypt]==1.7.4
-pydantic[email]
-python-jose[cryptography]
-pytest
-pydantic-settings
-python-multipart
-alembic
-azure.communication.email
-pyodbc
+pydantic[email]==2.11.7
+python-jose[cryptography]==3.5.0
+pydantic-settings==2.10.1
+python-multipart==0.0.20
+alembic==1.16.4
+azure-communication-email==1.0.0
+pyodbc==5.2.0

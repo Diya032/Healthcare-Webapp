@@ -3,7 +3,8 @@
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 import os
-ENVIRONMENT = os.getenv("ENVIRONMENT").lower()
+from app.core.config import settings
+ENVIRONMENT = settings.ENVIRONMENT
 
 def setup_cors(app):
     """
@@ -12,9 +13,9 @@ def setup_cors(app):
     - In production → only real frontend domain
     """
     if ENVIRONMENT == "development":
-        origins = [o.strip() for o in settings.DEV_CORS_ORIGINS.split(",")] + ["null"]
+        origins = [o.strip() for o in getattr(settings, "DEV_CORS_ORIGINS", "*").split(",") if o.strip()] + ["null"]
     else:  # production
-        origins = [o.strip() for o in settings.PROD_CORS_ORIGINS.split(",")]
+        origins = [o.strip() for o in getattr(settings, "PROD_CORS_ORIGINS", "*").split(",") if o.strip()]
 
     app.add_middleware(
         CORSMiddleware,

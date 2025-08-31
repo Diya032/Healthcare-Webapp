@@ -9,6 +9,7 @@ import os
 from pydantic_settings import BaseSettings
 from pydantic import Field
 from typing import Optional
+import logging
 # from urllib.parse import quote_plus
 
 
@@ -50,7 +51,10 @@ class Settings(BaseSettings):
     # CORS
     # -------------------
     DEV_CORS_ORIGINS: str = Field("*, null", description="Comma-separated list of allpwed CORS origins in development")
-    # PROD_CORS_ORIGINS:str = Field(..., description="Comma-separated list of allowed CORS origins in production")
+    PROD_CORS_ORIGINS:str = Field("*", description="Comma-separated list of allowed CORS origins in production")
+
+    # ENV
+    ENVIRONMENT: str = Field(ENVIRONMENT, description="Environment: development or production")
 
     class Config:
         env_file = ".env"  # local convenience
@@ -59,4 +63,31 @@ class Settings(BaseSettings):
 
 
 # Singleton settings object, import and use everywhere
-settings = Settings()
+# settings = Settings()
+
+# -------------------
+# Lazy-loaded singleton
+# -------------------
+# configure logging (if not already configured)
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+class _LazySettings:
+    _settings: Optional[Settings] = None
+
+    def __getattr__(self, name):
+        if self._settings is None:
+            self._settings = Settings()
+            # Log key environment/config values once
+            logger.info(f"[Settings] ENVIRONMENT={self._settings.ENVIRONMENT}")
+            logger.info(f"[Settings] DEV_CORS_ORIGINS={self._settings.DEV_CORS_ORIGINS}")
+            logger.info(f"[Settings] PROD_CORS_ORIGINS={self._settings.PROD_CORS_ORIGINS}")
+            logger.info(f"[Settings] DATABASE_URL={self._settings.DATABASE_URL}")
+
+            # optionally log masked or presence info for sensitive keys
+            logger.info(f"[Settings] ACS_CONNECTION_STRING is set: {bool(self._settings.ACS_CONNECTION_STRING)}")
+            logger.info(f"[Settings] SECRET_KEY is set: {bool(self._settings.SECRET_KEY)}")
+        return getattr(self._settings, name)
+
+
+settings = _LazySettings()
