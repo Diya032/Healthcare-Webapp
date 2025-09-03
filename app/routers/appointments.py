@@ -81,7 +81,7 @@ def book_appointment(
     background_tasks.add_task(
         service.send_email,
         appointment.patient.user.email,
-        f"Appointment Confirmation with Dr. {appointment.slot.doctor.name}",
+        f"Appointment Confirmation with {appointment.slot.doctor.name}",
         html_content
     )
 

@@ -4,10 +4,10 @@ appointment_email_template = """<!DOCTYPE html>
   <style>
     body {{ font-family: Arial, sans-serif; color: #333; line-height: 1.5; }}
     .container {{ max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }}
-    .header {{ background-color: #0078d4; color: white; padding: 10px; text-align: center; border-radius: 6px 6px 0 0; }}
+    .header {{ background-color: #B5EAD7; color: #034d4d;; padding: 10px; text-align: center; border-radius: 6px 6px 0 0; }}
     .content {{ padding: 20px; }}
     .footer {{ font-size: 12px; color: #666; text-align: center; padding-top: 10px; }}
-    .btn {{ display: inline-block; padding: 10px 20px; margin-top: 15px; background-color: #0078d4; color: white; text-decoration: none; border-radius: 5px; }}
+    .btn {{ display: inline-block; padding: 10px 20px; margin-top: 15px; background-color: #B5EAD7; color: #034d4d;; text-decoration: none; border-radius: 5px; }}
   </style>
 </head>
 <body>
