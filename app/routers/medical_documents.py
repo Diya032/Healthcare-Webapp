@@ -14,7 +14,7 @@ from app.core.dependencies import get_current_patient_or_409
 from app.models.models import DocumentIntelligence, Patient
 
 from app.blob_di.blob_sas import generate_sas_url, generate_sas_url_for_di
-from app.blob_di.blob_di_client import analyze_document  # your DI SDK wrapper
+from app.blob_di.blob_di_client import analyze_document  # Our DI SDK wrapper in blob_di_client.py
 
 router = APIRouter(prefix="/medical_documents", tags=["Medical Documents"])
 

@@ -9,11 +9,15 @@ passlib[bcrypt]==1.7.4
 pydantic[email]
 python-jose[cryptography]
 pytest
-# PyJWT
-# jwt
 pydantic-settings
 python-multipart
 alembic
-azure.communication.email
-azure.storage.blob
-azure.ai.formrecognizer
+azure-communication-email
+azure-storage-blob
+azure-ai-formrecognizer
+
+
+
+# curl -X PUT -T "C:\Users\Diya Khajuria\Downloads\prescription.jpg" ^
+#   -H "x-ms-blob-type: BlockBlob" ^
+#   "https://healthdocsstorage.blob.core.windows.net/medical-documents/2/5/prescription?se=2025-09-06T04%3A14%3A11Z&sp=w&sv=2025-07-05&sr=b&sig=KmLhWc%2BZ99FNeq49qIEMtiIoZe1l9m74iPODpa%2BlG6k%3D"

@@ -142,7 +142,7 @@ class DoctorOut(BaseModel):
     specialty: str
 
     class Config:
-        orm_mode = True
+        model_config = ConfigDict(from_attributes= True)
 
 # -------------------------
 # Slot Schemas
@@ -167,7 +167,7 @@ class SlotOut(BaseModel):
     specialty: str
 
     class Config:
-        orm_mode = True
+        model_config = ConfigDict(from_attributes= True)
 
 
 # -------------------------
@@ -190,7 +190,7 @@ class AppointmentOut(BaseModel):
     reason: Optional[str] = None
 
     class Config:
-        orm_mode = True
+        model_config = ConfigDict(from_attributes= True)
 
 
 class PatientAppointments(BaseModel):

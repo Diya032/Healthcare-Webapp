@@ -24,21 +24,20 @@ class Settings(BaseSettings):
     # -------------------
     # Database
     # -------------------
-    DATABASE_URL: str = Field(..., description="Database connection URL", alias="DATABASE-URL")
+    DATABASE_URL: str = Field(..., description="Database connection URL")
 
     # -------------------
     # Azure Communication Service
     # -------------------
-    ACS_CONNECTION_STRING: str = Field(..., description="Azure Communication Services connection string", alias="ACS-CONNECTION-STRING")
-    ACS_SENDER_EMAIL: str = Field(..., description="ACS verified sender email", alias="ACS-SENDER-EMAIL")
+    ACS_CONNECTION_STRING: str = Field(..., description="Azure Communication Services connection string")
+    ACS_SENDER_EMAIL: str = Field(..., description="ACS verified sender email")
 
     # -------------------
     # JWT Auth
     # -------------------
     SECRET_KEY: str = Field(
         ...,
-        description="Secret key used to sign JWTs (HS256). Replace in production!",
-        alias="SECRET-KEY")
+        description="Secret key used to sign JWTs (HS256). Replace in production!")
 
     ALGORITHM: str = Field(default="HS256", description="JWT signing algorithm")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=30, description="Access token lifetime (minutes)")
@@ -56,14 +55,14 @@ class Settings(BaseSettings):
     # -------------------
     # Azure Blob Storage
     # -------------------
-    AZURE_STORAGE_ACCOUNT: str = Field(..., description="Azure Storage account name", alias="AZURE-STORAGE-ACCOUNT")
-    AZURE_STORAGE_KEY:str = Field(..., description="Azure Storage account key", alias="AZURE-STORAGE-KEY")
+    AZURE_STORAGE_ACCOUNT: str = Field(..., description="Azure Storage account name")
+    AZURE_STORAGE_KEY:str = Field(..., description="Azure Storage account key")
 
     # -------------------
     # Azure Form Recognizer
     # -------------------
-    AZURE_FORM_RECOGNIZER_ENDPOINT: str = Field(..., description="Azure Form Recognizer endpoint", alias="AZURE-FORM-RECOGNIZER-ENDPOINT")
-    AZURE_FORM_RECOGNIZER_KEY: str = Field(..., description="Azure Form Recognizer key", alias="AZURE-FORM-RECOGNIZER-KEY")
+    AZURE_FORM_RECOGNIZER_ENDPOINT: str = Field(..., description="Azure Form Recognizer endpoint")
+    AZURE_FORM_RECOGNIZER_KEY: str = Field(..., description="Azure Form Recognizer key")
 
     class Config:
         env_file = ".env"  # local convenience
