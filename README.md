@@ -1,4 +1,3 @@
-````markdown
 # Healthcare-Webapp
 
 ## Problem Statement
@@ -107,7 +106,7 @@ git remote -v
 git push azure staging:master
 ```
 
-⚠️ Note: Azure uses `master` internally, even if GitHub uses `main`.
+Note: Azure uses `master` internally, even if GitHub uses `main`.
 
 ---
 
@@ -142,8 +141,5 @@ pip freeze > requirements.txt
 
 ---
 
-```
-
----
 
 ```
